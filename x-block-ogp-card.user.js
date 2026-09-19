@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         X: Block OGP Cards
 // @namespace    https://github.com/aiya000/tampermonky-x-block-ogp-card
-// @version      0.1.1
+// @version      0.1.2
 // @description  Replace link preview (OGP) cards of the specified domains with a placeholder on X (Twitter)
 // @author       aiya000
 // @license      MIT
@@ -59,11 +59,23 @@
     })
   }
 
+  /** Attributes that may carry the host name when the card does not render it as text */
+  const LABEL_ATTRIBUTES = ['aria-label', 'alt', 'title']
+
   /**
    * Finds the host name that the card shows as its source.
    *
-   * X renders it as the first bare host name text in the card detail,
-   * so a card without such a text (a poll card, for example) yields `null`.
+   * A card that names no host (a poll card, for example) yields `null`.
+   *
+   * @param {HTMLElement} card
+   * @returns {string | null}
+   */
+  function findCardHost(card) {
+    return findHostInText(card) ?? findHostInLabels(card)
+  }
+
+  /**
+   * Looks for the host name X prints under the card, as seen on a timeline.
    *
    * Every text node is walked rather than the `span`s alone, because X does not
    * wrap the host name in an element of its own -- the card title is a `span`,
@@ -72,15 +84,55 @@
    * @param {HTMLElement} card
    * @returns {string | null}
    */
-  function findCardHost(card) {
+  function findHostInText(card) {
     const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT)
     for (let node = walker.nextNode(); node !== null; node = walker.nextNode()) {
-      const text = (node.textContent ?? '').trim().toLowerCase()
-      if (HOST_NAME_PATTERN.test(text)) {
-        return text.replace(/^www\./, '')
+      const host = toHost(node.textContent ?? '')
+      if (host !== null) {
+        return host
       }
     }
     return null
+  }
+
+  /**
+   * Looks for the host name in the card's accessible labels.
+   *
+   * A tweet detail page (`/status/...`) prints no host under the card, but still
+   * labels it `'<host> <title>'`, so the label is the only source left there.
+   *
+   * @param {HTMLElement} card
+   * @returns {string | null}
+   */
+  function findHostInLabels(card) {
+    /** @type {ReadonlyArray<Element>} */
+    const elements = [card, ...card.querySelectorAll('*')]
+    for (const element of elements) {
+      for (const attribute of LABEL_ATTRIBUTES) {
+        const label = element.getAttribute(attribute) ?? ''
+        const host = toHost(label.trim().split(/\s+/)[0] ?? '')
+        if (host !== null) {
+          return host
+        }
+      }
+    }
+    return null
+  }
+
+  /**
+   * Reads a text that is nothing but a host name, or `null` when it is anything
+   * else. Requiring the whole text to match keeps a card description that opens
+   * with something like `Node.js` from being taken for a host.
+   *
+   * @param {string} text
+   * @returns {string | null}
+   */
+  function toHost(text) {
+    const candidate = text.trim().toLowerCase()
+    if (!HOST_NAME_PATTERN.test(candidate)) {
+      return null
+    }
+    return candidate.replace(/^www\./, '')
   }
 
   /**
