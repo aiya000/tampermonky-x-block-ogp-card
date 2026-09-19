@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         X: Block OGP Cards
 // @namespace    https://github.com/aiya000/tampermonky-x-block-ogp-card
-// @version      0.1.0
+// @version      0.1.1
 // @description  Replace link preview (OGP) cards of the specified domains with a placeholder on X (Twitter)
 // @author       aiya000
 // @license      MIT
@@ -39,7 +39,7 @@
 
   const CARD_SELECTOR = `[data-testid="card.wrapper"]:not([${BLOCKED_ATTRIBUTE}])`
 
-  /** A span holding only a bare host name, like `github.com` */
+  /** A text node holding only a bare host name, like `github.com` */
   const HOST_NAME_PATTERN = /^(?:[a-z0-9-]+\.)+[a-z]{2,}$/
 
   /**
@@ -65,14 +65,17 @@
    * X renders it as the first bare host name text in the card detail,
    * so a card without such a text (a poll card, for example) yields `null`.
    *
+   * Every text node is walked rather than the `span`s alone, because X does not
+   * wrap the host name in an element of its own -- the card title is a `span`,
+   * but the host name below it is not.
+   *
    * @param {HTMLElement} card
    * @returns {string | null}
    */
   function findCardHost(card) {
-    /** @type {NodeListOf<HTMLElement>} */
-    const spans = card.querySelectorAll('span')
-    for (let i = 0; i < spans.length; i++) {
-      const text = (spans.item(i).textContent ?? '').trim().toLowerCase()
+    const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT)
+    for (let node = walker.nextNode(); node !== null; node = walker.nextNode()) {
+      const text = (node.textContent ?? '').trim().toLowerCase()
       if (HOST_NAME_PATTERN.test(text)) {
         return text.replace(/^www\./, '')
       }

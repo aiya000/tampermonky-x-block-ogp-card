@@ -1,6 +1,6 @@
 {
   "name": "tampermonky-x-block-ogp-card",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Replace link preview (OGP) cards of the specified domains with a placeholder on X (Twitter)",
   "main": "x-block-ogp-card.user.js",
   "scripts": {
