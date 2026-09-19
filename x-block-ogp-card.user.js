@@ -14,9 +14,6 @@
 // @grant        none
 // ==/UserScript==
 
-// @ts-check
-// deno-lint-ignore-file no-window
-
 /**
  * @typedef {Object} Config
  * @property {ReadonlyArray<string>} blockedDomains - Registrable domains whose cards are replaced. A subdomain of them is also blocked (e.g. `gist.github.com` for `github.com`).
@@ -31,7 +28,7 @@
   const config = {
     blockedDomains: ['github.com'],
     placeholder: '[  OGP ❌️  ]',
-    clickToOpen: true,
+    clickToOpen: true
   }
 
   /**
@@ -53,7 +50,7 @@
 
     /** @type {NodeListOf<HTMLElement>} */
     const cards = document.querySelectorAll(CARD_SELECTOR)
-    cards.forEach((card) => {
+    cards.forEach(card => {
       const host = findCardHost(card)
       if (host === null || !isBlocked(host)) {
         return
@@ -88,9 +85,7 @@
    * @returns {boolean}
    */
   function isBlocked(host) {
-    return config.blockedDomains.some(
-      (domain) => host === domain || host.endsWith(`.${domain}`),
-    )
+    return config.blockedDomains.some(domain => host === domain || host.endsWith(`.${domain}`))
   }
 
   /**
@@ -109,7 +104,7 @@
       return
     }
 
-    card.addEventListener('click', (event) => {
+    card.addEventListener('click', event => {
       /** @type {HTMLAnchorElement | null} */
       const anchor = card.querySelector('a[href]')
       if (anchor === null) {

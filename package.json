@@ -1,0 +1,27 @@
+{
+  "name": "tampermonky-x-block-ogp-card",
+  "version": "0.1.0",
+  "description": "Replace link preview (OGP) cards of the specified domains with a placeholder on X (Twitter)",
+  "main": "x-block-ogp-card.user.js",
+  "scripts": {
+    "typecheck": "tsc",
+    "lint": "bun run eslint ; bun run prettier",
+    "eslint": "eslint x-block-ogp-card.user.js",
+    "prettier": "prettier x-block-ogp-card.user.js > /dev/null && echo 'Prettier: No issues found' || echo 'Prettier: Issues found'",
+    "fix": "bun run eslint:fix && bun run prettier:fix",
+    "eslint:fix": "eslint --fix x-block-ogp-card.user.js",
+    "prettier:fix": "prettier --write x-block-ogp-card.user.js"
+  },
+  "author": "aiya000",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/tampermonkey": "^5.0.5",
+    "eslint": "^9.39.4",
+    "eslint-plugin-import-x": "^4.16.2",
+    "eslint-plugin-n": "^17.24.0",
+    "eslint-plugin-promise": "^7.2.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.57.1"
+  }
+}

@@ -1,6 +1,8 @@
 # tampermonky-x-block-ogp-card
 
-A userscript that replaces link preview (OGP) cards on X (Twitter) with a plain placeholder.
+A Tampermonkey userscript that replaces link preview (OGP) cards on X (Twitter) with a plain placeholder.
+
+By default only `github.com` cards are replaced, so star counts and repository blurbs stop being pushed into your timeline. Any other domain can be added.
 
 ```
 before:  ┌──────────────────────────┐
@@ -15,15 +17,18 @@ after:   ┌──────────────────────�
          └──────────────────────────┘
 ```
 
-By default only `github.com` cards are replaced, so star counts and repository
-blurbs stop being pushed into your timeline. Any other domain can be added.
+## Features
 
-The placeholder is still clickable -- it opens the original link in a new tab.
+- **Domain allowlist** — Only the domains you list are replaced. Subdomains are covered too, so `github.com` also blocks `gist.github.com`
+- **Still clickable** — The placeholder opens the original link in a new tab
+- **CSS only** — The card's DOM is never rewritten, so X's React re-renders do not bring the card back
+- **SPA-aware** — Reacts to X's client-side updates via `MutationObserver`, coalesced with `requestAnimationFrame`
 
-## Install
+## Installation
 
-1. Install [Tampermonkey](https://www.tampermonkey.net/) (or Violentmonkey / Greasemonkey)
-2. Open [`x-block-ogp-card.user.js`](https://raw.githubusercontent.com/aiya000/tampermonky-x-block-ogp-card/main/x-block-ogp-card.user.js) and confirm the install dialog
+1. Install [Tampermonkey](https://www.tampermonkey.net/) in your browser (or Violentmonkey / Greasemonkey)
+2. Open [`x-block-ogp-card.user.js`](https://raw.githubusercontent.com/aiya000/tampermonky-x-block-ogp-card/main/x-block-ogp-card.user.js)
+3. Tampermonkey will prompt you to install the script — click **Install**
 
 ### On a phone
 
@@ -42,13 +47,15 @@ Everything lives in the `config` object at the top of the script:
 const config = {
   blockedDomains: ['github.com'],
   placeholder: '[  OGP ❌️  ]',
-  clickToOpen: true,
+  clickToOpen: true
 }
 ```
 
-- `blockedDomains` -- registrable domains whose cards are replaced. Subdomains are covered too, so `github.com` also blocks `gist.github.com`
-- `placeholder` -- the text shown instead of the card. It is used as a CSS `content` value, so keep it free of `'` and `\`
-- `clickToOpen` -- when `true`, clicking the placeholder opens the original link in a new tab
+| Key | Meaning |
+|---|---|
+| `blockedDomains` | Registrable domains whose cards are replaced. Subdomains are covered too |
+| `placeholder` | The text shown instead of the card. It is used as a CSS `content` value, so keep it free of `'` and `\` |
+| `clickToOpen` | When `true`, clicking the placeholder opens the original link in a new tab |
 
 ## How it works
 
@@ -69,11 +76,13 @@ manage `data-*` attributes it never set, so the marker survives.
 
 ## Development
 
-`deno-{lsp,lint}` + `jsdoc` + `ts-check`, with no build step.
+`bun` + `tsc` (via `jsdoc`) + `eslint` + `prettier`, with no build step.
 
 ```console
-$ deno check x-block-ogp-card.user.js
-$ deno lint x-block-ogp-card.user.js
+$ bun install
+$ bun run typecheck
+$ bun run lint
+$ bun run fix
 ```
 
 ## License
