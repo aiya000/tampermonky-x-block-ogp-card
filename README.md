@@ -24,6 +24,14 @@ after:   ┌──────────────────────�
 - **CSS only** — The card's DOM is never rewritten, so X's React re-renders do not bring the card back
 - **SPA-aware** — Reacts to X's client-side updates via `MutationObserver`, coalesced with `requestAnimationFrame`
 
+## Screenshot
+
+<!-- NOTE: Emulated 400px width in Chrome DevTools -->
+
+A `github.com` card on a profile timeline, replaced by the placeholder:
+
+<img src="./readme/smartphone-profile-blocked.png" width="400" />
+
 ## Installation
 
 1. Install [Tampermonkey](https://www.tampermonkey.net/) in your browser (or Violentmonkey / Greasemonkey)
