@@ -24,13 +24,15 @@ after:   ┌──────────────────────�
 - **CSS only** — The card's DOM is never rewritten, so X's React re-renders do not bring the card back
 - **SPA-aware** — Reacts to X's client-side updates via `MutationObserver`, coalesced with `requestAnimationFrame`
 
-## Screenshot
+## Screenshots
 
 <!-- NOTE: Emulated 400px width in Chrome DevTools -->
 
-A `github.com` card on a profile timeline, replaced by the placeholder:
+A `github.com` card on a profile timeline:
 
-<img src="./readme/smartphone-profile-blocked.png" width="400" />
+| Blocked | Original |
+|---|---|
+| <img src="./readme/smartphone-profile-blocked.png" width="400" /> | <img src="./readme/smartphone-profile-original.png" width="400" /> |
 
 ## Installation
 
