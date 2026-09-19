@@ -1,0 +1,81 @@
+# tampermonky-x-block-ogp-card
+
+A userscript that replaces link preview (OGP) cards on X (Twitter) with a plain placeholder.
+
+```
+before:  ┌──────────────────────────┐
+         │ [ a big preview image ]  │
+         │ github.com               │
+         │ owner/repo: description  │
+         │ ★ 12.3k                  │
+         └──────────────────────────┘
+
+after:   ┌──────────────────────────┐
+         │        [  OGP ❌️  ]      │
+         └──────────────────────────┘
+```
+
+By default only `github.com` cards are replaced, so star counts and repository
+blurbs stop being pushed into your timeline. Any other domain can be added.
+
+The placeholder is still clickable -- it opens the original link in a new tab.
+
+## Install
+
+1. Install [Tampermonkey](https://www.tampermonkey.net/) (or Violentmonkey / Greasemonkey)
+2. Open [`x-block-ogp-card.user.js`](https://raw.githubusercontent.com/aiya000/tampermonky-x-block-ogp-card/main/x-block-ogp-card.user.js) and confirm the install dialog
+
+### On a phone
+
+Mobile Chrome cannot run extensions, so one of these is needed:
+
+- **Android**: Firefox for Android, plus the Tampermonkey add-on
+- **iOS**: Safari, plus the [Userscripts](https://apps.apple.com/app/userscripts/id1463298887) app
+
+Then open the raw URL above in that browser.
+
+## Configuration
+
+Everything lives in the `config` object at the top of the script:
+
+```js
+const config = {
+  blockedDomains: ['github.com'],
+  placeholder: '[  OGP ❌️  ]',
+  clickToOpen: true,
+}
+```
+
+- `blockedDomains` -- registrable domains whose cards are replaced. Subdomains are covered too, so `github.com` also blocks `gist.github.com`
+- `placeholder` -- the text shown instead of the card. It is used as a CSS `content` value, so keep it free of `'` and `\`
+- `clickToOpen` -- when `true`, clicking the placeholder opens the original link in a new tab
+
+## How it works
+
+X renders every link card as `[data-testid="card.wrapper"]`, and shows the source
+host (`github.com`) as a bare text node inside it. The script looks for that host
+name, and when it matches, marks the wrapper with a `data-ogp-blocked` attribute.
+
+The rest is pure CSS:
+
+```css
+[data-ogp-blocked] > *    { display: none !important; }
+[data-ogp-blocked]::after { content: '[  OGP ❌️  ]'; }
+```
+
+The DOM structure is deliberately left untouched. X is a React app, so a card
+rebuilt by hand would be restored on the next re-render -- but React does not
+manage `data-*` attributes it never set, so the marker survives.
+
+## Development
+
+`deno-{lsp,lint}` + `jsdoc` + `ts-check`, with no build step.
+
+```console
+$ deno check x-block-ogp-card.user.js
+$ deno lint x-block-ogp-card.user.js
+```
+
+## License
+
+[MIT](./LICENSE)
